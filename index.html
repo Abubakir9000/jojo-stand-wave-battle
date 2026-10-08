@@ -3,433 +3,655 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>JoJo Stand Wave Battle</title>
+  <title>JoJo Stand Wave Survival</title>
   <style>
+    :root {
+      --bg: #050811;
+      --panel: rgba(14, 20, 34, 0.96);
+      --panel2: rgba(19, 26, 40, 0.96);
+      --gold: #f7d77e;
+      --gold2: #e4b95d;
+      --pink: #ff67d7;
+      --green: #68f5a7;
+      --cyan: #7fdcff;
+      --red: #ff5d5d;
+      --violet: #b28dff;
+      --text: #eef3ff;
+      --muted: #a9b6d1;
+      --shadow: rgba(0, 0, 0, 0.45);
+    }
+
     * { box-sizing: border-box; }
+
     html, body {
       margin: 0;
-      padding: 0;
-      width: 100%;
       height: 100%;
-      background: #0a0a0f;
-      color: #f0f0f0;
-      font-family: Arial, sans-serif;
+      background: radial-gradient(circle at top, #0a0f19 0%, #04070d 58%);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
       overflow: hidden;
     }
+
     body {
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
+      padding: 14px;
     }
-    .container {
+
+    .app {
       display: flex;
-      gap: 20px;
+      gap: 18px;
       width: 100%;
-      max-width: 1400px;
-      height: 100vh;
-      padding: 10px;
+      max-width: 1500px;
+      height: calc(100vh - 28px);
     }
-    .game-canvas {
-      flex: 1;
-      background: #0d1620;
-      border: 2px solid #f5d77b;
-      border-radius: 8px;
+
+    .game-shell {
       position: relative;
+      flex: 1;
+      min-width: 0;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(11, 18, 30, 0.95), rgba(9, 16, 28, 0.95));
+      border: 2px solid rgba(247, 215, 126, 0.85);
+      box-shadow: 0 0 26px rgba(247, 215, 126, 0.1), inset 0 0 30px rgba(255,255,255,0.02);
       overflow: hidden;
     }
+
+    .topbar {
+      position: absolute;
+      left: 18px;
+      top: 14px;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: calc(100% - 36px);
+      pointer-events: none;
+    }
+
+    .pill {
+      background: rgba(12, 18, 30, 0.8);
+      border: 1px solid rgba(247, 215, 126, 0.7);
+      color: var(--gold);
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 12px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      font-weight: 700;
+      box-shadow: 0 0 12px rgba(247, 215, 126, 0.15);
+    }
+
+    .switchrow {
+      display: flex;
+      gap: 10px;
+      pointer-events: auto;
+    }
+
+    .mini-btn {
+      background: rgba(18, 23, 34, 0.8);
+      border: 1px solid rgba(104, 245, 167, 0.75);
+      color: var(--green);
+      border-radius: 8px;
+      padding: 7px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.15s ease;
+    }
+
+    .mini-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(104, 245, 167, 0.2);
+    }
+
     canvas {
+      display: block;
       width: 100%;
       height: 100%;
-      display: block;
+      background: linear-gradient(180deg, #0d2230, #081922 50%, #07151c);
+      image-rendering: auto;
     }
-    .hud {
-      width: 300px;
-      background: rgba(20, 25, 40, 0.95);
-      border: 2px solid #f5d77b;
-      border-radius: 8px;
-      padding: 15px;
+
+    .sidebar {
+      width: 340px;
+      background: rgba(12, 18, 30, 0.96);
+      border: 2px solid rgba(247, 215, 126, 0.82);
+      border-radius: 14px;
+      padding: 14px;
+      box-shadow: inset 0 0 16px rgba(255,255,255,0.02);
       overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
     }
+
     .panel {
-      background: rgba(30, 35, 50, 0.8);
-      border: 1px solid rgba(245, 215, 123, 0.5);
-      border-radius: 6px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
       padding: 12px;
+      margin-bottom: 12px;
     }
-    .title {
-      color: #f5d77b;
-      font-weight: bold;
-      font-size: 12px;
+
+    .panel-title {
+      color: var(--gold);
+      margin: 0 0 10px;
+      font-size: 11px;
+      letter-spacing: 2px;
       text-transform: uppercase;
-      margin-bottom: 8px;
-      letter-spacing: 1px;
+      font-weight: 700;
     }
+
+    .stand-name {
+      color: var(--pink);
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0 0 6px;
+      text-shadow: 0 0 14px rgba(255, 103, 215, 0.45);
+    }
+
+    .stand-desc {
+      color: var(--text);
+      font-size: 12px;
+      line-height: 1.5;
+      margin: 0;
+      opacity: 0.9;
+    }
+
     .stat-row {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       font-size: 12px;
-      margin: 6px 0;
-      color: #e0e0e0;
+      color: var(--text);
+      margin: 7px 0;
     }
+
     .stat-value {
-      color: #7ef29b;
-      font-weight: bold;
+      color: var(--green);
+      font-weight: 700;
     }
+
     .bar {
+      height: 14px;
       width: 100%;
-      height: 12px;
-      background: rgba(0, 0, 0, 0.5);
-      border: 1px solid rgba(245, 215, 123, 0.3);
-      border-radius: 4px;
-      margin-top: 4px;
+      border-radius: 7px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(0,0,0,0.5);
       overflow: hidden;
+      margin-top: 4px;
+      margin-bottom: 8px;
     }
+
     .bar-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #5ef29b, #8ef7b5);
       width: 100%;
-      transition: width 0.1s linear;
+      height: 100%;
+      transition: width 0.12s linear;
     }
-    .bar-fill.stamina {
-      background: linear-gradient(90deg, #ffa500, #ffd700);
-    }
-    .bar-fill.power {
-      background: linear-gradient(90deg, #ff4db8, #c867ff);
-    }
+
+    .bar-fill.hp { background: linear-gradient(90deg,#38d47d,#71f4a4); }
+    .bar-fill.stamina { background: linear-gradient(90deg,#ff9d2d,#ffd669); }
+    .bar-fill.power { background: linear-gradient(90deg,#ff5dd7,#bd6cff); }
+
     .ability-list {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 8px;
+      margin-top: 6px;
     }
-    .ability-btn {
-      background: rgba(245, 215, 123, 0.08);
-      border: 1px solid rgba(245, 215, 123, 0.6);
-      color: #f0f0f0;
-      padding: 8px;
-      border-radius: 6px;
-      font-size: 11px;
-      cursor: pointer;
+
+    .ability-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      transition: 0.15s ease;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(247, 215, 126, 0.55);
+      background: rgba(247, 215, 126, 0.05);
+      color: #f4ecff;
+      cursor: pointer;
+      transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+      user-select: none;
     }
-    .ability-btn:hover {
-      background: rgba(245, 215, 123, 0.15);
-      border-color: #f5d77b;
+
+    .ability-item:hover {
+      transform: translateX(2px);
+      border-color: rgba(247, 215, 126, 1);
+      background: rgba(247, 215, 126, 0.1);
     }
-    .ability-btn.cooldown {
-      opacity: 0.5;
-      cursor: not-allowed;
+
+    .ability-item.cooldown {
+      opacity: 0.55;
+      filter: grayscale(0.15);
     }
-    .key-badge {
-      background: rgba(126, 242, 155, 0.2);
-      border: 1px solid rgba(126, 242, 155, 0.6);
-      color: #7ef29b;
-      padding: 2px 6px;
-      border-radius: 3px;
-      font-weight: bold;
+
+    .ability-name {
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .ability-meta {
       font-size: 10px;
+      color: var(--muted);
+      display: block;
+      margin-top: 2px;
     }
+
+    .ability-key {
+      min-width: 24px;
+      text-align: center;
+      display: inline-block;
+      background: rgba(104, 245, 167, 0.12);
+      border: 1px solid rgba(104, 245, 167, 0.7);
+      color: var(--green);
+      border-radius: 5px;
+      padding: 2px 5px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .controls {
+      font-size: 12px;
+      line-height: 1.7;
+      color: #ebf0ff;
+    }
+
+    .kbd {
+      display: inline-block;
+      min-width: 20px;
+      padding: 1px 6px;
+      border-radius: 5px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: white;
+      font-weight: 700;
+      text-align: center;
+    }
+
     .menu {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(4, 7, 13, 0.84);
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 1000;
+      z-index: 50;
     }
+
+    .menu.hidden {
+      display: none;
+    }
+
     .menu-box {
-      background: rgba(20, 25, 40, 0.95);
-      border: 2px solid #f5d77b;
-      border-radius: 12px;
-      padding: 30px;
+      width: min(820px, 90vw);
+      background: rgba(16, 22, 36, 0.97);
+      border: 2px solid rgba(247, 215, 126, 0.9);
+      border-radius: 16px;
+      padding: 26px;
+      box-shadow: 0 18px 50px rgba(0,0,0,0.4);
+    }
+
+    .menu-box h2 {
+      margin: 0 0 18px;
       text-align: center;
-      max-width: 600px;
+      color: var(--gold);
+      font-size: 26px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
     }
-    .menu-box h1 {
-      color: #f5d77b;
-      margin: 0 0 20px;
-      font-size: 28px;
-    }
-    .stand-select {
+
+    .stand-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      margin: 20px 0;
+      grid-template-columns: repeat(3, minmax(160px, 1fr));
+      gap: 14px;
     }
+
     .stand-card {
-      background: rgba(30, 35, 50, 0.8);
-      border: 2px solid rgba(245, 215, 123, 0.4);
-      border-radius: 8px;
-      padding: 15px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 14px;
       cursor: pointer;
-      transition: 0.15s ease;
+      transition: 0.12s ease;
+      min-height: 116px;
     }
+
     .stand-card:hover {
-      border-color: #f5d77b;
-      background: rgba(245, 215, 123, 0.1);
+      transform: translateY(-2px);
+      border-color: rgba(247, 215, 126, 0.8);
+      box-shadow: 0 12px 18px rgba(0,0,0,0.2);
     }
+
     .stand-card.selected {
-      border-color: #f5d77b;
-      background: rgba(245, 215, 123, 0.15);
-      box-shadow: 0 0 15px rgba(245, 215, 123, 0.3);
+      background: rgba(247, 215, 126, 0.08);
+      border-color: rgba(247, 215, 126, 1);
+      box-shadow: 0 0 18px rgba(247, 215, 126, 0.16);
     }
+
     .stand-card h3 {
-      color: #f5d77b;
       margin: 0 0 8px;
+      color: var(--gold);
       font-size: 16px;
     }
+
     .stand-card p {
-      color: #d0d0d0;
-      font-size: 12px;
       margin: 0;
-      line-height: 1.4;
-    }
-    .start-btn {
-      background: linear-gradient(180deg, #f5d77b, #e6b85a);
-      color: #1a1a1a;
-      border: none;
-      border-radius: 6px;
-      padding: 12px 24px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 20px;
-      transition: 0.15s ease;
-    }
-    .start-btn:hover {
-      filter: brightness(1.1);
-    }
-    .hidden {
-      display: none !important;
-    }
-    .overlay-text {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      background: rgba(0, 0, 0, 0.6);
-      color: #f5d77b;
-      padding: 12px 18px;
-      border-radius: 6px;
-      font-weight: bold;
-      font-size: 14px;
-      pointer-events: none;
-    }
-    .float-info {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      background: rgba(0, 0, 0, 0.6);
-      color: #e0e0e0;
-      padding: 12px 18px;
-      border-radius: 6px;
       font-size: 12px;
-      pointer-events: none;
+      line-height: 1.4;
+      color: #dfe8ff;
     }
+
+    .start-btn {
+      display: block;
+      margin: 22px auto 0;
+      border: none;
+      background: linear-gradient(180deg, #f5d77b, #ddaf57);
+      color: #1a1200;
+      border-radius: 10px;
+      padding: 12px 26px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 14px 24px rgba(247, 215, 126, 0.22);
+    }
+
+    .start-btn:hover { filter: brightness(1.05); }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="game-canvas">
-      <canvas id="gameCanvas"></canvas>
-      <div class="overlay-text" id="waveText">Wave 1</div>
-      <div class="float-info" id="infoText">Stand: Dormant</div>
+  <div class="app">
+    <div class="game-shell">
+      <div class="topbar">
+        <div class="pill" id="waveLabel">Wave 1</div>
+        <div class="switchrow">
+          <button class="mini-btn" id="toggleStandBtn">Stand: Dormant</button>
+        </div>
+      </div>
+      <canvas id="gameCanvas" width="1200" height="700"></canvas>
     </div>
 
-    <div class="hud">
+    <aside class="sidebar">
       <div class="panel">
-        <div class="title">Stand Info</div>
-        <h3 id="standTitle" style="color: #ff67d7; margin: 0 0 8px; font-size: 18px;">The World</h3>
-        <p id="standDesc" style="color: #d0d0d0; font-size: 12px; margin: 0; line-height: 1.4;">Select a stand to begin</p>
+        <div class="panel-title">Stand</div>
+        <div id="standName" class="stand-name">The World</div>
+        <p id="standDesc" class="stand-desc">Time control. Freeze your enemies and unleash deadly barrages.</p>
       </div>
 
       <div class="panel">
-        <div class="title">Status</div>
-        <div class="stat-row">
-          <span>Health</span>
-          <span class="stat-value" id="hpText">100 / 100</span>
-        </div>
-        <div class="bar"><div id="hpBar" class="bar-fill"></div></div>
+        <div class="panel-title">Status</div>
+        <div class="stat-row"><span>Health</span><span class="stat-value" id="hpText">100 / 100</span></div>
+        <div class="bar"><div id="hpBar" class="bar-fill hp"></div></div>
 
-        <div class="stat-row">
-          <span>Stamina</span>
-          <span class="stat-value" id="stamText">100 / 100</span>
-        </div>
-        <div class="bar"><div id="stamBar" class="bar-fill stamina"></div></div>
+        <div class="stat-row"><span>Stamina</span><span class="stat-value" id="staminaText">100 / 100</span></div>
+        <div class="bar"><div id="staminaBar" class="bar-fill stamina"></div></div>
 
-        <div class="stat-row">
-          <span>Stand Power</span>
-          <span class="stat-value" id="powText">100 / 100</span>
-        </div>
-        <div class="bar"><div id="powBar" class="bar-fill power"></div></div>
+        <div class="stat-row"><span>Stand Power</span><span class="stat-value" id="powerText">100 / 100</span></div>
+        <div class="bar"><div id="powerBar" class="bar-fill power"></div></div>
       </div>
 
       <div class="panel">
-        <div class="title">Abilities</div>
+        <div class="panel-title">Abilities</div>
         <div id="abilityList" class="ability-list"></div>
       </div>
 
       <div class="panel">
-        <div class="title">Controls</div>
-        <div style="font-size: 11px; line-height: 1.6; color: #e0e0e0;">
-          <div><strong>WASD</strong> - Move</div>
-          <div><strong>Mouse</strong> - Aim</div>
-          <div><strong>Q</strong> - Toggle Stand</div>
-          <div><strong>LMB</strong> - M1 Attack</div>
-          <div><strong>E-Z</strong> - Abilities</div>
-          <div><strong>R</strong> - Restart</div>
+        <div class="panel-title">Controls</div>
+        <div class="controls">
+          <div><span class="kbd">WASD</span> Move</div>
+          <div><span class="kbd">Q</span> Toggle stand</div>
+          <div><span class="kbd">LMB</span> Melee</div>
+          <div><span class="kbd">E/R/T/G/V/C/X/Z</span> Skills</div>
+          <div><span class="kbd">R</span> Restart</div>
         </div>
       </div>
-    </div>
+    </aside>
   </div>
 
   <div id="menuOverlay" class="menu">
     <div class="menu-box">
-      <h1>Select Your Stand</h1>
-      <div class="stand-select" id="standSelect"></div>
-      <button class="start-btn" id="startGameBtn">Start Battle</button>
+      <h2>Select a Stand</h2>
+      <div id="standGrid" class="stand-grid"></div>
+      <button id="startBattleBtn" class="start-btn">Start Battle</button>
     </div>
   </div>
 
   <script>
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
-    let W = 900, H = 640;
 
-    function resizeCanvas() {
-      const container = canvas.parentElement;
-      W = container.clientWidth;
-      H = container.clientHeight;
-      canvas.width = W;
-      canvas.height = H;
-    }
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
+    const WORLD_WIDTH = 2200;
+    const WORLD_HEIGHT = 1800;
+    const VIEW_WIDTH = canvas.width;
+    const VIEW_HEIGHT = canvas.height;
 
-    const stands = {
+    const standDefs = {
       'The World': {
         name: 'The World',
-        desc: 'Time-controlling stand. Unleash barrages and devastating punches.',
-        color: '#c59eff',
+        desc: 'Time control. The user can freeze the world and unleash devastating barrages.',
+        color: '#d4a7ff',
+        accent: '#ffd36d',
         abilities: [
-          { key: 'E', name: 'Barrage', cost: 10, cooldown: 0.4, damage: 15, type: 'barrage' },
-          { key: 'R', name: 'Heavy Punch', cost: 15, cooldown: 1.2, damage: 30, type: 'melee' },
-          { key: 'T', name: 'Knife Throw', cost: 12, cooldown: 0.8, damage: 20, type: 'projectile' },
-          { key: 'G', name: 'Time Stop', cost: 40, cooldown: 10, damage: 0, type: 'timestop' },
-          { key: 'V', name: 'World Slash', cost: 20, cooldown: 2, damage: 35, type: 'slash' },
-          { key: 'C', name: 'Ora Kick', cost: 18, cooldown: 1.5, damage: 28, type: 'melee' },
-          { key: 'X', name: 'Hammer Smash', cost: 22, cooldown: 2.2, damage: 40, type: 'melee' },
-          { key: 'Z', name: 'Za Warudo!', cost: 60, cooldown: 12, damage: 80, type: 'ultimate' }
+          { key: 'E', name: 'Barrage', cost: 8, cooldown: 0.4, damage: 16, kind: 'melee', range: 82 },
+          { key: 'R', name: 'Knife Throw', cost: 12, cooldown: 0.9, damage: 22, kind: 'projectile', range: 90 },
+          { key: 'T', name: 'Heavy Punch', cost: 15, cooldown: 1.2, damage: 30, kind: 'melee', range: 104 },
+          { key: 'G', name: 'Time Stop', cost: 35, cooldown: 10, damage: 0, kind: 'timestop', range: 0 },
+          { key: 'V', name: 'World Slash', cost: 20, cooldown: 1.8, damage: 32, kind: 'slash', range: 150 },
+          { key: 'C', name: 'Road Roller', cost: 22, cooldown: 2.1, damage: 36, kind: 'burst', range: 170 },
+          { key: 'X', name: 'Instant Dying', cost: 24, cooldown: 3.2, damage: 42, kind: 'dash', range: 144 },
+          { key: 'Z', name: 'Za Warudo!', cost: 60, cooldown: 15, damage: 80, kind: 'ultimate', range: 220 }
+        ]
+      },
+      'Star Platinum': {
+        name: 'Star Platinum',
+        desc: 'An ultra-fast and precise stand with insane reaction speed and devastating fists.',
+        color: '#ecf5ff',
+        accent: '#8ec7ff',
+        abilities: [
+          { key: 'E', name: 'Star Barrage', cost: 10, cooldown: 0.35, damage: 18, kind: 'melee', range: 85 },
+          { key: 'R', name: 'Ora Throw', cost: 12, cooldown: 0.9, damage: 24, kind: 'projectile', range: 100 },
+          { key: 'T', name: 'The World! Rush', cost: 17, cooldown: 1.5, damage: 28, kind: 'dash', range: 140 },
+          { key: 'G', name: 'Time Skip', cost: 30, cooldown: 7, damage: 0, kind: 'burst', range: 140 },
+          { key: 'V', name: 'Star Slash', cost: 22, cooldown: 1.8, damage: 34, kind: 'slash', range: 160 },
+          { key: 'C', name: 'Crushing Blow', cost: 18, cooldown: 1.3, damage: 30, kind: 'melee', range: 110 },
+          { key: 'X', name: 'Shatter Fist', cost: 26, cooldown: 3, damage: 44, kind: 'burst', range: 170 },
+          { key: 'Z', name: 'Star Platinum: The World', cost: 70, cooldown: 18, damage: 92, kind: 'ultimate', range: 240 }
         ]
       },
       'Silver Chariot': {
         name: 'Silver Chariot',
-        desc: 'Swift swordsman with rapid elegant strikes.',
-        color: '#d9e8ff',
+        desc: 'Swordsman with unbelievable speed and elegant finishing strikes.',
+        color: '#dfe9ff',
+        accent: '#f0ff9d',
         abilities: [
-          { key: 'E', name: 'Quick Slash', cost: 10, cooldown: 0.35, damage: 14, type: 'slash' },
-          { key: 'R', name: 'Lunging Thrust', cost: 14, cooldown: 1, damage: 25, type: 'projectile' },
-          { key: 'T', name: 'Arc Strike', cost: 16, cooldown: 1.2, damage: 28, type: 'slash' },
-          { key: 'G', name: 'Charge Attack', cost: 18, cooldown: 1.8, damage: 32, type: 'melee' },
-          { key: 'V', name: 'Sword Rain', cost: 22, cooldown: 2.4, damage: 38, type: 'barrage' },
-          { key: 'C', name: 'Armor Break', cost: 20, cooldown: 2, damage: 34, type: 'melee' },
-          { key: 'X', name: 'Silver Storm', cost: 28, cooldown: 3.5, damage: 45, type: 'barrage' },
-          { key: 'Z', name: 'Golden Rush', cost: 65, cooldown: 13, damage: 85, type: 'ultimate' }
+          { key: 'E', name: 'Quick Slash', cost: 9, cooldown: 0.3, damage: 15, kind: 'slash', range: 90 },
+          { key: 'R', name: 'Piercing Lunge', cost: 14, cooldown: 0.95, damage: 24, kind: 'projectile', range: 110 },
+          { key: 'T', name: 'Silver Arc', cost: 18, cooldown: 1.4, damage: 30, kind: 'slash', range: 150 },
+          { key: 'G', name: 'Armor Charge', cost: 18, cooldown: 1.9, damage: 28, kind: 'dash', range: 140 },
+          { key: 'V', name: 'Sword Rain', cost: 22, cooldown: 2.4, damage: 36, kind: 'barrage', range: 170 },
+          { key: 'C', name: 'Armor Break', cost: 20, cooldown: 2, damage: 32, kind: 'melee', range: 120 },
+          { key: 'X', name: 'Silver Storm', cost: 30, cooldown: 3.5, damage: 50, kind: 'barrage', range: 180 },
+          { key: 'Z', name: 'Golden Rush', cost: 68, cooldown: 16, damage: 90, kind: 'ultimate', range: 230 }
         ]
       },
       "Magician's Red": {
         name: "Magician's Red",
-        desc: 'Fiery stand with relentless flame pressure.',
-        color: '#ff7a45',
+        desc: 'Fiery domination. Breathe flames and ignite the battlefield.',
+        color: '#ff8d62',
+        accent: '#ffde70',
         abilities: [
-          { key: 'E', name: 'Flame Punch', cost: 11, cooldown: 0.45, damage: 16, type: 'melee' },
-          { key: 'R', name: 'Fireball', cost: 13, cooldown: 0.9, damage: 22, type: 'projectile' },
-          { key: 'T', name: 'Heat Wave', cost: 17, cooldown: 1.4, damage: 30, type: 'slash' },
-          { key: 'G', name: 'Meteor Storm', cost: 24, cooldown: 2.3, damage: 36, type: 'barrage' },
-          { key: 'V', name: 'Inferno', cost: 26, cooldown: 2.8, damage: 40, type: 'aoe' },
-          { key: 'C', name: 'Fire Floor', cost: 20, cooldown: 2, damage: 32, type: 'aoe' },
-          { key: 'X', name: 'Phoenix Rush', cost: 30, cooldown: 4, damage: 48, type: 'dash' },
-          { key: 'Z', name: 'Burning Inferno', cost: 70, cooldown: 14, damage: 90, type: 'ultimate' }
+          { key: 'E', name: 'Flame Punch', cost: 11, cooldown: 0.45, damage: 17, kind: 'melee', range: 88 },
+          { key: 'R', name: 'Fireball', cost: 14, cooldown: 0.8, damage: 22, kind: 'projectile', range: 90 },
+          { key: 'T', name: 'Heat Wave', cost: 18, cooldown: 1.3, damage: 30, kind: 'slash', range: 150 },
+          { key: 'G', name: 'Meteor Burst', cost: 22, cooldown: 2.3, damage: 36, kind: 'burst', range: 170 },
+          { key: 'V', name: 'Fire Floor', cost: 24, cooldown: 2.5, damage: 38, kind: 'aoe', range: 150 },
+          { key: 'C', name: 'Phoenix Rush', cost: 24, cooldown: 3.2, damage: 40, kind: 'dash', range: 150 },
+          { key: 'X', name: 'Pyro Storm', cost: 32, cooldown: 4.4, damage: 52, kind: 'barrage', range: 200 },
+          { key: 'Z', name: 'Inferno', cost: 75, cooldown: 17, damage: 96, kind: 'ultimate', range: 250 }
+        ]
+      },
+      'Crazy Diamond': {
+        name: 'Crazy Diamond',
+        desc: 'A repair-and-reconstruction stand that can break enemies apart and restore body state.',
+        color: '#8bdfff',
+        accent: '#fff3a6',
+        abilities: [
+          { key: 'E', name: 'Diamond Smash', cost: 10, cooldown: 0.4, damage: 17, kind: 'melee', range: 82 },
+          { key: 'R', name: 'Crystal Shot', cost: 13, cooldown: 0.85, damage: 22, kind: 'projectile', range: 95 },
+          { key: 'T', name: 'Shatter Burst', cost: 18, cooldown: 1.4, damage: 31, kind: 'burst', range: 150 },
+          { key: 'G', name: 'Repair Pulse', cost: 22, cooldown: 4.5, damage: 0, kind: 'heal', range: 0 },
+          { key: 'V', name: 'Diamond Slash', cost: 22, cooldown: 1.8, damage: 35, kind: 'slash', range: 150 },
+          { key: 'C', name: 'Mirror Break', cost: 20, cooldown: 2, damage: 32, kind: 'melee', range: 130 },
+          { key: 'X', name: 'Crystal Barrage', cost: 30, cooldown: 3.8, damage: 46, kind: 'barrage', range: 180 },
+          { key: 'Z', name: 'Reality Fix', cost: 72, cooldown: 16, damage: 94, kind: 'ultimate', range: 220 }
         ]
       },
       'D4C': {
         name: 'D4C',
-        desc: 'Dimensional stand with unpredictable clone tactics.',
-        color: '#7bd3ff',
+        desc: 'Dimensional movement, clone tricks, and impossible angles of attack.',
+        color: '#7ec5ff',
+        accent: '#f3d5ff',
         abilities: [
-          { key: 'E', name: 'Dimension Cut', cost: 10, cooldown: 0.4, damage: 16, type: 'slash' },
-          { key: 'R', name: 'Clone Rush', cost: 16, cooldown: 1.1, damage: 26, type: 'barrage' },
-          { key: 'T', name: 'Portal Bolt', cost: 14, cooldown: 0.95, damage: 24, type: 'projectile' },
-          { key: 'G', name: 'Dimension Swap', cost: 16, cooldown: 3, damage: 0, type: 'dash' },
-          { key: 'V', name: 'Reality Ripple', cost: 18, cooldown: 1.5, damage: 28, type: 'slash' },
-          { key: 'C', name: 'Gap Sphere', cost: 20, cooldown: 2.2, damage: 34, type: 'aoe' },
-          { key: 'X', name: 'Portal Stream', cost: 26, cooldown: 3.8, damage: 44, type: 'projectile' },
-          { key: 'Z', name: 'World Break', cost: 72, cooldown: 15, damage: 92, type: 'ultimate' }
+          { key: 'E', name: 'Dimension Cut', cost: 10, cooldown: 0.42, damage: 17, kind: 'slash', range: 88 },
+          { key: 'R', name: 'Portal Bolt', cost: 14, cooldown: 0.9, damage: 22, kind: 'projectile', range: 100 },
+          { key: 'T', name: 'Clone Rush', cost: 18, cooldown: 1.2, damage: 28, kind: 'dash', range: 150 },
+          { key: 'G', name: 'Dimension Swap', cost: 18, cooldown: 3.2, damage: 0, kind: 'blink', range: 0 },
+          { key: 'V', name: 'Reality Ripple', cost: 20, cooldown: 1.6, damage: 32, kind: 'slash', range: 150 },
+          { key: 'C', name: 'Gap Sphere', cost: 20, cooldown: 2.2, damage: 34, kind: 'aoe', range: 160 },
+          { key: 'X', name: 'Portal Stream', cost: 28, cooldown: 3.8, damage: 46, kind: 'projectile', range: 180 },
+          { key: 'Z', name: 'World Break', cost: 76, cooldown: 17, damage: 98, kind: 'ultimate', range: 260 }
+        ]
+      },
+      'King Crimson': {
+        name: 'King Crimson',
+        desc: 'Time erasure. It bypasses danger and removes the threat before the enemy can react.',
+        color: '#ff8595',
+        accent: '#fff2ad',
+        abilities: [
+          { key: 'E', name: 'Epitaph Slash', cost: 10, cooldown: 0.45, damage: 18, kind: 'slash', range: 90 },
+          { key: 'R', name: 'Erase Step', cost: 12, cooldown: 0.8, damage: 20, kind: 'projectile', range: 110 },
+          { key: 'T', name: 'Blink Rush', cost: 18, cooldown: 1.3, damage: 28, kind: 'dash', range: 150 },
+          { key: 'G', name: 'Time Skip', cost: 28, cooldown: 7, damage: 0, kind: 'skip', range: 0 },
+          { key: 'V', name: 'Void Slice', cost: 22, cooldown: 1.7, damage: 36, kind: 'slash', range: 160 },
+          { key: 'C', name: 'Knife Storm', cost: 24, cooldown: 2.5, damage: 38, kind: 'barrage', range: 170 },
+          { key: 'X', name: 'Overclock', cost: 30, cooldown: 3.8, damage: 48, kind: 'burst', range: 180 },
+          { key: 'Z', name: 'Time Erase', cost: 78, cooldown: 18, damage: 100, kind: 'ultimate', range: 260 }
+        ]
+      },
+      'Gold Experience': {
+        name: 'Gold Experience',
+        desc: 'Life and vitality. It can turn enemies into weapons and produce explosive life force.',
+        color: '#ffd669',
+        accent: '#8af7c7',
+        abilities: [
+          { key: 'E', name: 'Life Punch', cost: 10, cooldown: 0.4, damage: 16, kind: 'melee', range: 86 },
+          { key: 'R', name: 'Life Shot', cost: 13, cooldown: 0.85, damage: 23, kind: 'projectile', range: 110 },
+          { key: 'T', name: 'Growth Burst', cost: 17, cooldown: 1.2, damage: 28, kind: 'burst', range: 150 },
+          { key: 'G', name: 'Regeneration', cost: 24, cooldown: 4.5, damage: 0, kind: 'heal', range: 0 },
+          { key: 'V', name: 'Golden Slash', cost: 22, cooldown: 1.8, damage: 35, kind: 'slash', range: 150 },
+          { key: 'C', name: 'Vine Coil', cost: 20, cooldown: 2, damage: 31, kind: 'aoe', range: 160 },
+          { key: 'X', name: 'Evolution Rush', cost: 26, cooldown: 3.5, damage: 45, kind: 'dash', range: 150 },
+          { key: 'Z', name: 'Golden Life', cost: 72, cooldown: 16, damage: 96, kind: 'ultimate', range: 240 }
+        ]
+      },
+      'White Album': {
+        name: 'White Album',
+        desc: 'A polished and elegant stand that manipulates melody and pressure in a graceful way.',
+        color: '#f5f2ff',
+        accent: '#d9c5ff',
+        abilities: [
+          { key: 'E', name: 'Melody Jab', cost: 10, cooldown: 0.38, damage: 17, kind: 'melee', range: 82 },
+          { key: 'R', name: 'Note Shot', cost: 13, cooldown: 0.85, damage: 22, kind: 'projectile', range: 95 },
+          { key: 'T', name: 'Echo Blade', cost: 18, cooldown: 1.3, damage: 29, kind: 'slash', range: 150 },
+          { key: 'G', name: 'Crescendo', cost: 22, cooldown: 2.2, damage: 35, kind: 'burst', range: 170 },
+          { key: 'V', name: 'Harmony Wave', cost: 24, cooldown: 2.2, damage: 37, kind: 'aoe', range: 150 },
+          { key: 'C', name: 'Grace Rush', cost: 22, cooldown: 2.8, damage: 34, kind: 'dash', range: 150 },
+          { key: 'X', name: 'Finale Storm', cost: 30, cooldown: 4.2, damage: 50, kind: 'barrage', range: 190 },
+          { key: 'Z', name: 'White Symphony', cost: 74, cooldown: 16, damage: 98, kind: 'ultimate', range: 250 }
+        ]
+      },
+      'Cream': {
+        name: 'Cream',
+        desc: 'A fickle stand capable of nullifying movement and manipulating space at a distance.',
+        color: '#baf1ff',
+        accent: '#94f5cc',
+        abilities: [
+          { key: 'E', name: 'Null Punch', cost: 11, cooldown: 0.42, damage: 18, kind: 'melee', range: 84 },
+          { key: 'R', name: 'Null Bolt', cost: 14, cooldown: 0.9, damage: 24, kind: 'projectile', range: 100 },
+          { key: 'T', name: 'Space Break', cost: 18, cooldown: 1.3, damage: 30, kind: 'slash', range: 150 },
+          { key: 'G', name: 'Cancel Field', cost: 22, cooldown: 4.2, damage: 0, kind: 'stun', range: 0 },
+          { key: 'V', name: 'Void Wave', cost: 24, cooldown: 2, damage: 35, kind: 'aoe', range: 160 },
+          { key: 'C', name: 'Shift Dash', cost: 20, cooldown: 2.3, damage: 30, kind: 'blink', range: 0 },
+          { key: 'X', name: 'Null Barrage', cost: 30, cooldown: 3.8, damage: 48, kind: 'barrage', range: 180 },
+          { key: 'Z', name: 'Time Void', cost: 75, cooldown: 17, damage: 100, kind: 'ultimate', range: 250 }
         ]
       }
     };
 
-    const gameState = {
+    const state = {
       mode: 'menu',
       selectedStand: 'The World',
-      running: false,
+      started: false,
       player: null,
       enemies: [],
       projectiles: [],
       particles: [],
       wave: 1,
       score: 0,
-      waveInProgress: false,
       nextWaveTimer: 0,
+      killFeed: [],
+      camera: { x: 0, y: 0 },
       timeStopTimer: 0,
-      buffs: []
+      lastTs: 0,
+      standCooldownMap: {} 
     };
 
     const input = {
       keys: {},
-      mouse: { x: W / 2, y: H / 2 }
+      mouseX: 0,
+      mouseY: 0,
+      mouseDown: false
     };
 
-    function initMenu() {
-      const selectContainer = document.getElementById('standSelect');
-      selectContainer.innerHTML = '';
-      Object.keys(stands).forEach(standName => {
-        const card = document.createElement('div');
-        card.className = 'stand-card';
-        if (standName === 'The World') card.classList.add('selected');
-        card.innerHTML = `<h3>${standName}</h3><p>${stands[standName].desc}</p>`;
-        card.addEventListener('click', () => {
-          document.querySelectorAll('.stand-card').forEach(c => c.classList.remove('selected'));
-          card.classList.add('selected');
-          gameState.selectedStand = standName;
-        });
-        selectContainer.appendChild(card);
-      });
-
-      document.getElementById('startGameBtn').addEventListener('click', startGame);
+    function clamp(value, min, max) {
+      return Math.min(Math.max(value, min), max);
     }
 
-    function startGame() {
-      document.getElementById('menuOverlay').classList.add('hidden');
-      gameState.mode = 'game';
-      gameState.running = true;
-      gameState.wave = 1;
-      gameState.score = 0;
-      gameState.buffs = [];
+    function buildStandMenu() {
+      const grid = document.getElementById('standGrid');
+      grid.innerHTML = '';
+      for (const name of Object.keys(standDefs)) {
+        const card = document.createElement('div');
+        card.className = 'stand-card';
+        if (name === state.selectedStand) card.classList.add('selected');
+        card.innerHTML = '<h3>' + name + '</h3><p>' + standDefs[name].desc + '</p>';
+        card.addEventListener('click', () => {
+          state.selectedStand = name;
+          document.querySelectorAll('.stand-card').forEach(c => c.classList.remove('selected'));
+          card.classList.add('selected');
+        });
+        grid.appendChild(card);
+      }
+    }
 
-      const standName = gameState.selectedStand;
-      const standDef = stands[standName];
-
-      gameState.player = {
-        x: W / 2,
-        y: H / 2,
-        r: 14,
-        speed: 2.5,
+    function startBattle() {
+      const standName = state.selectedStand;
+      const def = standDefs[standName];
+      state.started = true;
+      state.mode = 'game';
+      state.wave = 1;
+      state.score = 0;
+      state.nextWaveTimer = 0;
+      state.timeStopTimer = 0;
+      state.enemies = [];
+      state.projectiles = [];
+      state.particles = [];
+      state.camera.x = 0;
+      state.camera.y = 0;
+      state.player = {
+        x: WORLD_WIDTH / 2,
+        y: WORLD_HEIGHT / 2,
+        r: 16,
+        speed: 3.2,
         hp: 100,
         maxHp: 100,
         stamina: 100,
@@ -439,504 +661,646 @@
         direction: 0,
         standActive: false,
         invuln: 0,
-        damageMultiplier: 1.0,
-        standName: standName,
-        abilities: JSON.parse(JSON.stringify(standDef.abilities))
+        damageMultiplier: 1,
+        standName,
+        abilities: JSON.parse(JSON.stringify(def.abilities)),
+        meleeCooldown: 0,
+        dashCooldown: 0,
+        lastHit: 0
       };
-
-      gameState.enemies = [];
-      gameState.projectiles = [];
-      gameState.particles = [];
-      gameState.waveInProgress = false;
+      document.getElementById('menuOverlay').classList.add('hidden');
+      updateStandInfo();
       spawnWave();
     }
 
-    function spawnWave() {
-      gameState.enemies = [];
-      const count = 5 + gameState.wave * 1.5;
-      const isBossWave = gameState.wave % 10 === 0;
-
-      for (let i = 0; i < count; i++) {
-        const side = Math.floor(Math.random() * 4);
-        let x = 0, y = 0;
-        if (side === 0) { x = Math.random() * W; y = -30; }
-        else if (side === 1) { x = W + 30; y = Math.random() * H; }
-        else if (side === 2) { x = Math.random() * W; y = H + 30; }
-        else { x = -30; y = Math.random() * H; }
-
-        const enemyHp = isBossWave ? 180 + gameState.wave * 20 : 20 + gameState.wave * 2;
-        gameState.enemies.push({
-          x, y,
-          r: isBossWave ? 24 : 14,
-          hp: enemyHp,
-          maxHp: enemyHp,
-          speed: isBossWave ? 0.8 : 0.7 + Math.random() * 1.3,
-          color: isBossWave ? '#ff5555' : '#52ef7d',
-          isBoss: isBossWave,
-          shootCooldown: 1.5,
-          hitFlash: 0
-        });
-      }
-      gameState.waveInProgress = true;
+    function resetBattle() {
+      state.started = false;
+      state.mode = 'menu';
+      document.getElementById('menuOverlay').classList.remove('hidden');
+      buildStandMenu();
     }
 
-    function updateGame(deltaTime) {
-      const p = gameState.player;
+    function updateStandInfo() {
+      const p = state.player;
       if (!p) return;
+      const def = standDefs[p.standName];
+      document.getElementById('standName').textContent = def.name;
+      document.getElementById('standDesc').textContent = def.desc;
+      document.getElementById('toggleStandBtn').textContent = p.standActive ? 'Stand: Active' : 'Stand: Dormant';
+    }
 
-      // Movement
-      let mx = 0, my = 0;
-      if (input.keys['w'] || input.keys['W'] || input.keys['ArrowUp']) my -= 1;
-      if (input.keys['s'] || input.keys['S'] || input.keys['ArrowDown']) my += 1;
-      if (input.keys['a'] || input.keys['A'] || input.keys['ArrowLeft']) mx -= 1;
-      if (input.keys['d'] || input.keys['D'] || input.keys['ArrowRight']) mx += 1;
+    function updateSidebarAbilityList() {
+      const p = state.player;
+      const list = document.getElementById('abilityList');
+      if (!p || !list) return;
+      const def = standDefs[p.standName];
+      list.innerHTML = '';
+      for (const ability of def.abilities) {
+        const div = document.createElement('div');
+        div.className = 'ability-item';
+        const now = performance.now() / 1000;
+        const cdEnd = state.standCooldownMap[ability.key] || 0;
+        const onCooldown = now < cdEnd;
+        if (onCooldown) div.classList.add('cooldown');
 
-      if (mx || my) {
-        const len = Math.hypot(mx, my) || 1;
-        p.x += (mx / len) * p.speed * 60 * deltaTime;
-        p.y += (my / len) * p.speed * 60 * deltaTime;
+        const label = onCooldown ? `${(cdEnd - now).toFixed(1)}s` : `${ability.cost} power`;
+        div.innerHTML = `
+          <div>
+            <span class="ability-name">${ability.name}</span>
+            <span class="ability-meta">${label}</span>
+          </div>
+          <span class="ability-key">${ability.key}</span>
+        `;
+        div.addEventListener('click', () => {
+          if (p.standActive) castAbility(ability);
+        });
+        list.appendChild(div);
       }
-
-      p.x = Math.max(20, Math.min(W - 20, p.x));
-      p.y = Math.max(20, Math.min(H - 20, p.y));
-
-      // Stamina and Power regen
-      p.stamina = Math.min(p.maxStamina, p.stamina + 30 * deltaTime);
-      p.power = Math.min(p.maxPower, p.power + 5 * deltaTime);
-      p.invuln = Math.max(0, p.invuln - deltaTime);
-
-      // Update enemies
-      gameState.enemies.forEach(enemy => {
-        const dx = p.x - enemy.x;
-        const dy = p.y - enemy.y;
-        const dist = Math.hypot(dx, dy) || 1;
-
-        enemy.x += (dx / dist) * enemy.speed * 60 * deltaTime;
-        enemy.y += (dy / dist) * enemy.speed * 60 * deltaTime;
-        enemy.hitFlash = Math.max(0, enemy.hitFlash - deltaTime * 2);
-
-        enemy.shootCooldown -= deltaTime;
-        if (enemy.shootCooldown <= 0) {
-          enemy.shootCooldown = 1.2;
-          const angle = Math.atan2(p.y - enemy.y, p.x - enemy.x);
-          gameState.projectiles.push({
-            x: enemy.x,
-            y: enemy.y,
-            angle: angle,
-            speed: 4,
-            damage: 8,
-            owner: 'enemy'
-          });
-        }
-
-        if (Math.hypot(p.x - enemy.x, p.y - enemy.y) < p.r + enemy.r + 5 && p.invuln <= 0) {
-          p.hp -= 10;
-          p.invuln = 0.6;
-          if (p.hp <= 0) gameState.running = false;
-        }
-      });
-
-      // Update projectiles
-      gameState.projectiles = gameState.projectiles.filter(proj => {
-        proj.x += Math.cos(proj.angle) * proj.speed * 60 * deltaTime;
-        proj.y += Math.sin(proj.angle) * proj.speed * 60 * deltaTime;
-
-        if (proj.owner === 'player') {
-          for (let i = gameState.enemies.length - 1; i >= 0; i--) {
-            const enemy = gameState.enemies[i];
-            if (Math.hypot(enemy.x - proj.x, enemy.y - proj.y) < enemy.r + 5) {
-              enemy.hp -= proj.damage;
-              gameState.particles.push({
-                x: enemy.x, y: enemy.y,
-                text: `-${Math.round(proj.damage)}`,
-                life: 0.6,
-                color: '#ff7688'
-              });
-              if (enemy.hp <= 0) {
-                gameState.enemies.splice(i, 1);
-                gameState.score += 10;
-                p.power = Math.min(p.maxPower, p.power + 15);
-              }
-              return false;
-            }
-          }
-        } else if (proj.owner === 'enemy') {
-          if (Math.hypot(p.x - proj.x, p.y - proj.y) < p.r + 5) {
-            p.hp -= proj.damage;
-            p.invuln = 0.4;
-            if (p.hp <= 0) gameState.running = false;
-            return false;
-          }
-        }
-
-        return proj.x > -50 && proj.x < W + 50 && proj.y > -50 && proj.y < H + 50;
-      });
-
-      // Update particles
-      gameState.particles = gameState.particles.filter(part => {
-        part.life -= deltaTime;
-        if (part.text) part.y -= 0.5;
-        return part.life > 0;
-      });
-
-      // Wave management
-      if (gameState.waveInProgress && gameState.enemies.length === 0) {
-        gameState.waveInProgress = false;
-        gameState.nextWaveTimer = 2;
-      }
-      if (!gameState.waveInProgress) {
-        gameState.nextWaveTimer -= deltaTime;
-        if (gameState.nextWaveTimer <= 0) {
-          gameState.wave += 1;
-          if (gameState.wave % 10 === 0) {
-            p.maxHp += 20;
-            p.hp = p.maxHp;
-            p.damageMultiplier *= 1.15;
-          }
-          spawnWave();
-        }
-      }
-
-      updateHUD();
     }
 
     function updateHUD() {
-      const p = gameState.player;
-      if (!p) return;
+      const p = state.player; if (!p) return;
+      document.getElementById('hpText').textContent = `${Math.ceil(p.hp)} / ${p.maxHp}`;
+      document.getElementById('staminaText').textContent = `${Math.ceil(p.stamina)} / ${p.maxStamina}`;
+      document.getElementById('powerText').textContent = `${Math.ceil(p.power)} / ${p.maxPower}`;
+      document.getElementById('hpBar').style.width = `${(p.hp / p.maxHp) * 100}%`;
+      document.getElementById('staminaBar').style.width = `${(p.stamina / p.maxStamina) * 100}%`;
+      document.getElementById('powerBar').style.width = `${(p.power / p.maxPower) * 100}%`;
+      document.getElementById('waveLabel').textContent = `Wave ${state.wave}` + (state.wave % 10 === 0 ? ' • Boss' : '');
+      updateStandInfo();
+      updateSidebarAbilityList();
+    }
 
-      document.getElementById('hpText').textContent = `${Math.ceil(Math.max(0, p.hp))} / ${p.maxHp}`;
-      document.getElementById('stamText').textContent = `${Math.ceil(Math.max(0, p.stamina))} / ${p.maxStamina}`;
-      document.getElementById('powText').textContent = `${Math.ceil(Math.max(0, p.power))} / ${p.maxPower}`;
+    function toggleStand() {
+      if (!state.player) return;
+      state.player.standActive = !state.player.standActive;
+      updateStandInfo();
+      if (state.player.standActive) {
+        createBurst(state.player.x, state.player.y, standDefs[state.player.standName].accent, 16, 0.8);
+      }
+    }
 
-      document.getElementById('hpBar').style.width = `${(Math.max(0, p.hp) / p.maxHp) * 100}%`;
-      document.getElementById('stamBar').style.width = `${(Math.max(0, p.stamina) / p.maxStamina) * 100}%`;
-      document.getElementById('powBar').style.width = `${(Math.max(0, p.power) / p.maxPower) * 100}%`;
+    function spawnWave() {
+      const bossWave = state.wave % 10 === 0;
+      const count = bossWave ? 1 : 5 + Math.floor(state.wave * 1.4);
+      state.enemies = [];
+      for (let i = 0; i < count; i++) {
+        const side = Math.floor(Math.random() * 4);
+        let x = 0, y = 0;
+        if (side === 0) { x = Math.random() * WORLD_WIDTH; y = -30; }
+        else if (side === 1) { x = WORLD_WIDTH + 30; y = Math.random() * WORLD_HEIGHT; }
+        else if (side === 2) { x = Math.random() * WORLD_WIDTH; y = WORLD_HEIGHT + 30; }
+        else { x = -30; y = Math.random() * WORLD_HEIGHT; }
 
-      const standInfo = stands[p.standName];
-      document.getElementById('standTitle').textContent = p.standName;
-      document.getElementById('standDesc').textContent = standInfo.desc;
-      document.getElementById('infoText').textContent = `Stand: ${p.standActive ? 'Active' : 'Dormant'} | Wave: ${gameState.wave}`;
-      document.getElementById('waveText').textContent = `Wave ${gameState.wave}${gameState.wave % 10 === 0 ? ' - BOSS' : ''}`;
+        const maxHp = bossWave ? 220 + state.wave * 35 : 26 + state.wave * 4;
+        state.enemies.push({
+          x, y,
+          r: bossWave ? 30 : 16 + Math.random() * 4,
+          hp: maxHp,
+          maxHp,
+          speed: bossWave ? 0.9 + state.wave * 0.04 : 0.8 + Math.random() * 1.2,
+          color: bossWave ? '#ff5b5b' : '#4ee18d',
+          type: bossWave ? 'boss' : ['runner', 'shooter', 'tank'][Math.floor(Math.random() * 3)],
+          shootCooldown: bossWave ? 1.1 : 1.5 + Math.random() * 1.3,
+          hitFlash: 0,
+          value: bossWave ? 120 : 12 + state.wave * 2
+        });
+      }
+      state.nextWaveTimer = 0;
+    }
 
-      const abilityContainer = document.getElementById('abilityList');
-      abilityContainer.innerHTML = '';
-      p.abilities.forEach(ability => {
-        const btn = document.createElement('button');
-        btn.className = 'ability-btn';
-        const now = performance.now() / 1000;
-        const canUse = p.power >= ability.cost && (!ability.lastCast || now - ability.lastCast >= ability.cooldown);
-        if (ability.lastCast && now - ability.lastCast < ability.cooldown) {
-          btn.classList.add('cooldown');
-          const remaining = (ability.cooldown - (now - ability.lastCast)).toFixed(1);
-          btn.textContent = `${ability.name} (${remaining}s)`;
-        } else {
-          btn.textContent = `${ability.name}`;
-        }
-        btn.innerHTML += `<span class="key-badge">${ability.key}</span>`;
-        abilityContainer.appendChild(btn);
+    function createBurst(x, y, color, n = 20, life = 0.8) {
+      for (let i = 0; i < n; i++) {
+        const a = Math.random() * Math.PI * 2;
+        const speed = 0.5 + Math.random() * 2.5;
+        state.particles.push({
+          x, y,
+          vx: Math.cos(a) * speed,
+          vy: Math.sin(a) * speed,
+          r: 2 + Math.random() * 4,
+          color,
+          life, maxLife: life,
+          type: 'spark'
+        });
+      }
+    }
+
+    function createText(x, y, text, color = '#ff7d9d') {
+      state.particles.push({
+        x, y,
+        vx: (Math.random() - 0.5) * 0.6,
+        vy: -0.7,
+        text,
+        color,
+        life: 0.8,
+        maxLife: 0.8,
+        type: 'text'
       });
     }
 
-    function renderGame() {
-      const p = gameState.player;
-
-      // Background
-      ctx.fillStyle = '#0d1620';
-      ctx.fillRect(0, 0, W, H);
-
-      // Grid
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
-      ctx.lineWidth = 1;
-      for (let x = 0; x < W; x += 40) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, H);
-        ctx.stroke();
-      }
-      for (let y = 0; y < H; y += 40) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(W, y);
-        ctx.stroke();
-      }
-
-      if (!p) return;
-
-      // Draw enemies
-      gameState.enemies.forEach(enemy => {
-        ctx.fillStyle = enemy.hitFlash > 0 ? '#ffff88' : enemy.color;
-        ctx.beginPath();
-        ctx.arc(enemy.x, enemy.y, enemy.r, 0, Math.PI * 2);
-        ctx.fill();
-
-        // HP bar
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-        ctx.fillRect(enemy.x - 18, enemy.y - 26, 36, 5);
-        ctx.fillStyle = '#52ef7d';
-        ctx.fillRect(enemy.x - 18, enemy.y - 26, 36 * (enemy.hp / enemy.maxHp), 5);
-      });
-
-      // Draw projectiles
-      gameState.projectiles.forEach(proj => {
-        ctx.fillStyle = proj.owner === 'player' ? '#7fd3ff' : '#ffa500';
-        ctx.beginPath();
-        ctx.arc(proj.x, proj.y, 5, 0, Math.PI * 2);
-        ctx.fill();
-      });
-
-      // Draw player
-      ctx.save();
-      ctx.translate(p.x, p.y);
-      ctx.rotate(p.direction);
-
-      if (p.standActive) {
-        ctx.shadowColor = stands[p.standName].color;
-        ctx.shadowBlur = 15;
-      }
-
-      ctx.fillStyle = p.standActive ? stands[p.standName].color : '#f0f0f0';
-      ctx.beginPath();
-      ctx.arc(0, 0, p.r, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = '#1a1a1a';
-      ctx.beginPath();
-      ctx.arc(4, -2, 3, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.strokeStyle = '#52ef7d';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(0, 0);
-      ctx.lineTo(p.r + 14, 0);
-      ctx.stroke();
-
-      ctx.restore();
-
-      // Player HP bar
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-      ctx.fillRect(p.x - 20, p.y - 28, 40, 5);
-      ctx.fillStyle = '#52ef7d';
-      ctx.fillRect(p.x - 20, p.y - 28, 40 * (Math.max(0, p.hp) / p.maxHp), 5);
-
-      // Draw particles
-      gameState.particles.forEach(part => {
-        ctx.globalAlpha = Math.max(0, part.life / 0.6);
-        if (part.text) {
-          ctx.fillStyle = part.color;
-          ctx.font = '700 16px Arial';
-          ctx.textAlign = 'center';
-          ctx.fillText(part.text, part.x, part.y);
+    function damageEnemy(enemy, amount, atX, atY) {
+      if (!enemy || enemy.hp <= 0) return;
+      enemy.hp -= amount;
+      enemy.hitFlash = 0.2;
+      createText(atX, atY, `-${Math.round(amount)}`, '#ff8ca4');
+      if (enemy.hp <= 0) {
+        state.score += enemy.value || 10;
+        state.player.power = clamp(state.player.power + 12, 0, state.player.maxPower);
+        state.enemies = state.enemies.filter(e => e !== enemy);
+        createBurst(enemy.x, enemy.y, enemy.color, 25, 1.0);
+        if (enemy.type === 'boss') {
+          state.player.maxHp += 18;
+          state.player.hp = state.player.maxHp;
+          state.player.damageMultiplier *= 1.12;
+          state.player.power = state.player.maxPower;
         }
-        ctx.globalAlpha = 1;
-      });
-
-      // Game Over screen
-      if (!gameState.running) {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-        ctx.fillRect(0, 0, W, H);
-        ctx.fillStyle = '#fff';
-        ctx.font = 'bold 48px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText('Battle Lost', W / 2, H / 2 - 20);
-        ctx.font = '20px Arial';
-        ctx.fillText(`Wave: ${gameState.wave} | Score: ${gameState.score}`, W / 2, H / 2 + 20);
-        ctx.fillText('Press R to retry', W / 2, H / 2 + 60);
       }
     }
 
     function castAbility(ability) {
-      const p = gameState.player;
-      if (!p.standActive || p.power < ability.cost) return;
-
+      const p = state.player;
+      if (!p || !p.standActive) return;
       const now = performance.now() / 1000;
-      if (ability.lastCast && now - ability.lastCast < ability.cooldown) return;
-
-      ability.lastCast = now;
+      const key = ability.key;
+      const cdEnd = state.standCooldownMap[key] || 0;
+      if (now < cdEnd || p.power < ability.cost) return;
+      state.standCooldownMap[key] = now + ability.cooldown;
       p.power -= ability.cost;
 
       const angle = p.direction || 0;
-      const cx = p.x + Math.cos(angle) * 35;
-      const cy = p.y + Math.sin(angle) * 35;
+      const cx = p.x + Math.cos(angle) * 38;
+      const cy = p.y + Math.sin(angle) * 38;
 
-      if (ability.type === 'barrage' || ability.type === 'melee') {
-        gameState.enemies.forEach(enemy => {
-          const d = Math.hypot(enemy.x - cx, enemy.y - cy);
-          if (d < 80) {
-            enemy.hp -= ability.damage * p.damageMultiplier;
-            gameState.particles.push({
-              x: enemy.x, y: enemy.y,
-              text: `-${Math.round(ability.damage * p.damageMultiplier)}`,
-              life: 0.6,
-              color: '#ff7688'
-            });
-            if (enemy.hp <= 0) {
-              gameState.enemies.splice(gameState.enemies.indexOf(enemy), 1);
-              gameState.score += 10;
-              p.power = Math.min(p.maxPower, p.power + 15);
-            }
+      if (ability.kind === 'melee') {
+        for (const enemy of state.enemies) {
+          if (Math.hypot(enemy.x - cx, enemy.y - cy) < ability.range + enemy.r) {
+            damageEnemy(enemy, ability.damage * p.damageMultiplier, enemy.x, enemy.y);
           }
-        });
+        }
+        createBurst(cx, cy, standDefs[p.standName].accent, 14, 0.7);
       }
 
-      if (ability.type === 'projectile') {
-        gameState.projectiles.push({
+      if (ability.kind === 'projectile') {
+        state.projectiles.push({
           x: cx, y: cy,
-          angle: angle,
-          speed: 6,
+          angle,
+          speed: 8,
           damage: ability.damage * p.damageMultiplier,
-          owner: 'player'
+          radius: 5,
+          owner: 'player',
+          color: standDefs[p.standName].color,
+          life: 2.6,
+          kind: ability.name
         });
       }
 
-      if (ability.type === 'slash') {
-        gameState.enemies.forEach(enemy => {
-          const d = Math.hypot(enemy.x - cx, enemy.y - cy);
-          if (d < 100) {
-            enemy.hp -= ability.damage * p.damageMultiplier;
-            gameState.particles.push({
-              x: enemy.x, y: enemy.y,
-              text: `-${Math.round(ability.damage * p.damageMultiplier)}`,
-              life: 0.6,
-              color: '#ff7688'
-            });
-            if (enemy.hp <= 0) {
-              gameState.enemies.splice(gameState.enemies.indexOf(enemy), 1);
-              gameState.score += 10;
-              p.power = Math.min(p.maxPower, p.power + 15);
-            }
+      if (ability.kind === 'slash') {
+        for (const enemy of state.enemies) {
+          if (Math.hypot(enemy.x - cx, enemy.y - cy) < ability.range + enemy.r) {
+            damageEnemy(enemy, ability.damage * p.damageMultiplier, enemy.x, enemy.y);
           }
-        });
+        }
+        createBurst(cx, cy, standDefs[p.standName].color, 20, 0.9);
       }
 
-      if (ability.type === 'aoe') {
-        gameState.enemies.forEach(enemy => {
-          const d = Math.hypot(enemy.x - p.x, enemy.y - p.y);
-          if (d < 140) {
-            enemy.hp -= ability.damage * p.damageMultiplier;
-            gameState.particles.push({
-              x: enemy.x, y: enemy.y,
-              text: `-${Math.round(ability.damage * p.damageMultiplier)}`,
-              life: 0.6,
-              color: '#ff7688'
-            });
-            if (enemy.hp <= 0) {
-              gameState.enemies.splice(gameState.enemies.indexOf(enemy), 1);
-              gameState.score += 10;
-              p.power = Math.min(p.maxPower, p.power + 15);
-            }
+      if (ability.kind === 'dash') {
+        const dist = ability.range || 150;
+        p.x = clamp(p.x + Math.cos(angle) * dist, 30, WORLD_WIDTH - 30);
+        p.y = clamp(p.y + Math.sin(angle) * dist, 30, WORLD_HEIGHT - 30);
+        createBurst(p.x, p.y, standDefs[p.standName].accent, 18, 0.8);
+        for (const enemy of state.enemies) {
+          if (Math.hypot(enemy.x - p.x, enemy.y - p.y) < 90 + enemy.r) {
+            damageEnemy(enemy, ability.damage * p.damageMultiplier, enemy.x, enemy.y);
           }
-        });
+        }
       }
 
-      if (ability.type === 'dash') {
-        p.x += Math.cos(angle) * 60;
-        p.y += Math.sin(angle) * 60;
-        p.x = Math.max(20, Math.min(W - 20, p.x));
-        p.y = Math.max(20, Math.min(H - 20, p.y));
-      }
-
-      if (ability.type === 'timestop') {
-        gameState.timeStopTimer = 1.5;
-      }
-
-      if (ability.type === 'ultimate') {
-        gameState.enemies.forEach(enemy => {
-          const d = Math.hypot(enemy.x - p.x, enemy.y - p.y);
-          if (d < 200) {
-            enemy.hp -= ability.damage * p.damageMultiplier;
-            gameState.particles.push({
-              x: enemy.x, y: enemy.y,
-              text: `-${Math.round(ability.damage * p.damageMultiplier)}`,
-              life: 0.6,
-              color: '#ff7688'
-            });
-            if (enemy.hp <= 0) {
-              gameState.enemies.splice(gameState.enemies.indexOf(enemy), 1);
-              gameState.score += 10;
-              p.power = Math.min(p.maxPower, p.power + 15);
-            }
+      if (ability.kind === 'burst') {
+        for (const enemy of state.enemies) {
+          if (Math.hypot(enemy.x - cx, enemy.y - cy) < ability.range + enemy.r) {
+            damageEnemy(enemy, ability.damage * p.damageMultiplier, enemy.x, enemy.y);
           }
-        });
+        }
+        createBurst(cx, cy, standDefs[p.standName].color, 28, 1.1);
+      }
+
+      if (ability.kind === 'aoe') {
+        for (const enemy of state.enemies) {
+          if (Math.hypot(enemy.x - p.x, enemy.y - p.y) < ability.range + enemy.r) {
+            damageEnemy(enemy, ability.damage * p.damageMultiplier, enemy.x, enemy.y);
+          }
+        }
+        createBurst(p.x, p.y, standDefs[p.standName].color, 32, 1.2);
+      }
+
+      if (ability.kind === 'heal') {
+        p.hp = clamp(p.hp + 24, 0, p.maxHp);
+        createText(p.x, p.y - 25, '+24', '#7af7b9');
+      }
+
+      if (ability.kind === 'timestop') {
+        state.timeStopTimer = 1.8;
+        createBurst(p.x, p.y, '#ffd76b', 36, 1.5);
+      }
+
+      if (ability.kind === 'blink') {
+        p.x = clamp(p.x + Math.cos(angle) * 110, 30, WORLD_WIDTH - 30);
+        p.y = clamp(p.y + Math.sin(angle) * 110, 30, WORLD_HEIGHT - 30);
+        createBurst(p.x, p.y, standDefs[p.standName].color, 20, 0.8);
+      }
+
+      if (ability.kind === 'stun') {
+        for (const enemy of state.enemies) {
+          if (Math.hypot(enemy.x - p.x, enemy.y - p.y) < 180 + enemy.r) {
+            enemy.hitFlash = 0.8;
+            enemy.speed *= 0.35;
+          }
+        }
+        createBurst(p.x, p.y, standDefs[p.standName].accent, 24, 1.0);
+      }
+
+      if (ability.kind === 'skip') {
+        state.timeStopTimer = 1.2;
+        p.x = clamp(p.x + Math.cos(angle) * 70, 30, WORLD_WIDTH - 30);
+        p.y = clamp(p.y + Math.sin(angle) * 70, 30, WORLD_HEIGHT - 30);
+      }
+
+      if (ability.kind === 'ultimate') {
+        for (const enemy of state.enemies) {
+          if (Math.hypot(enemy.x - p.x, enemy.y - p.y) < ability.range + enemy.r) {
+            damageEnemy(enemy, ability.damage * p.damageMultiplier, enemy.x, enemy.y);
+          }
+        }
+        createBurst(p.x, p.y, standDefs[p.standName].accent, 40, 1.7);
       }
     }
 
+    function playerMelee() {
+      const p = state.player;
+      if (!p) return;
+      const now = performance.now() / 1000;
+      if (now < p.meleeCooldown) return;
+      p.meleeCooldown = now + 0.18;
+      const angle = p.direction || 0;
+      const cx = p.x + Math.cos(angle) * 38;
+      const cy = p.y + Math.sin(angle) * 38;
+      for (const enemy of state.enemies) {
+        if (Math.hypot(enemy.x - cx, enemy.y - cy) < 72 + enemy.r) {
+          damageEnemy(enemy, 12 * p.damageMultiplier, enemy.x, enemy.y);
+        }
+      }
+      createBurst(cx, cy, standDefs[p.standName].accent, 12, 0.6);
+    }
+
+    function updatePlayer(dt) {
+      const p = state.player;
+      if (!p) return;
+
+      let dx = 0, dy = 0;
+      if (input.keys['w'] || input.keys['W'] || input.keys['ArrowUp']) dy -= 1;
+      if (input.keys['s'] || input.keys['S'] || input.keys['ArrowDown']) dy += 1;
+      if (input.keys['a'] || input.keys['A'] || input.keys['ArrowLeft']) dx -= 1;
+      if (input.keys['d'] || input.keys['D'] || input.keys['ArrowRight']) dx += 1;
+
+      if (dx || dy) {
+        const len = Math.hypot(dx, dy) || 1;
+        p.x += (dx / len) * p.speed * 60 * dt;
+        p.y += (dy / len) * p.speed * 60 * dt;
+      }
+
+      p.x = clamp(p.x, 20, WORLD_WIDTH - 20);
+      p.y = clamp(p.y, 20, WORLD_HEIGHT - 20);
+      p.stamina = clamp(p.stamina + 22 * dt, 0, p.maxStamina);
+      p.power = clamp(p.power + 4.2 * dt, 0, p.maxPower);
+      p.invuln = Math.max(0, p.invuln - dt);
+
+      state.camera.x = clamp(p.x - VIEW_WIDTH / 2, 0, WORLD_WIDTH - VIEW_WIDTH);
+      state.camera.y = clamp(p.y - VIEW_HEIGHT / 2, 0, WORLD_HEIGHT - VIEW_HEIGHT);
+    }
+
+    function updateEnemies(dt) {
+      const p = state.player;
+      if (!p) return;
+      for (const enemy of state.enemies) {
+        const dx = p.x - enemy.x;
+        const dy = p.y - enemy.y;
+        const d = Math.hypot(dx, dy) || 1;
+
+        if (state.timeStopTimer > 0) {
+          enemy.hitFlash = Math.max(0, enemy.hitFlash - dt * 2);
+          continue;
+        }
+
+        enemy.x += (dx / d) * enemy.speed * 60 * dt;
+        enemy.y += (dy / d) * enemy.speed * 60 * dt;
+        enemy.hitFlash = Math.max(0, enemy.hitFlash - dt * 2);
+
+        if (enemy.type === 'shooter' || enemy.type === 'boss') {
+          enemy.shootCooldown -= dt;
+          if (enemy.shootCooldown <= 0) {
+            enemy.shootCooldown = enemy.type === 'boss' ? 0.9 : 1.4 + Math.random() * 0.8;
+            const angle = Math.atan2(p.y - enemy.y, p.x - enemy.x);
+            state.projectiles.push({
+              x: enemy.x, y: enemy.y,
+              angle,
+              speed: enemy.type === 'boss' ? 6 : 4,
+              damage: enemy.type === 'boss' ? 12 : 8,
+              radius: enemy.type === 'boss' ? 7 : 5,
+              owner: 'enemy',
+              color: '#ffbf5c',
+              life: 3,
+              kind: 'enemy-projectile'
+            });
+          }
+        }
+
+        if (Math.hypot(p.x - enemy.x, p.y - enemy.y) < p.r + enemy.r + 5 && p.invuln <= 0) {
+          p.hp -= enemy.type === 'boss' ? 16 : 10;
+          p.invuln = 0.7;
+          createText(p.x, p.y - 20, `-${enemy.type === 'boss' ? 16 : 10}`, '#ff7d7d');
+          if (p.hp <= 0) {
+            state.mode = 'over';
+          }
+        }
+      }
+    }
+
+    function updateProjectiles(dt) {
+      for (let i = state.projectiles.length - 1; i >= 0; i--) {
+        const proj = state.projectiles[i];
+        if (state.timeStopTimer > 0) continue;
+        proj.x += Math.cos(proj.angle) * proj.speed * 60 * dt;
+        proj.y += Math.sin(proj.angle) * proj.speed * 60 * dt;
+        proj.life -= dt;
+
+        if (proj.owner === 'player') {
+          for (const enemy of state.enemies) {
+            if (Math.hypot(enemy.x - proj.x, enemy.y - proj.y) <= enemy.r + proj.radius) {
+              damageEnemy(enemy, proj.damage, proj.x, proj.y);
+              state.projectiles.splice(i, 1);
+              break;
+            }
+          }
+        } else {
+          const p = state.player;
+          if (p && Math.hypot(p.x - proj.x, p.y - proj.y) <= p.r + proj.radius + 2) {
+            p.hp -= proj.damage;
+            p.invuln = 0.45;
+            createText(p.x, p.y - 20, `-${proj.damage}`, '#ff7d7d');
+            if (p.hp <= 0) state.mode = 'over';
+            state.projectiles.splice(i, 1);
+            continue;
+          }
+        }
+
+        if (proj.life <= 0 || proj.x < -60 || proj.x > WORLD_WIDTH + 60 || proj.y < -60 || proj.y > WORLD_HEIGHT + 60) {
+          state.projectiles.splice(i, 1);
+        }
+      }
+    }
+
+    function updateParticles(dt) {
+      for (let i = state.particles.length - 1; i >= 0; i--) {
+        const p = state.particles[i];
+        p.life -= dt;
+        if (p.type === 'spark') {
+          p.x += p.vx * 60 * dt;
+          p.y += p.vy * 60 * dt;
+        } else {
+          p.x += p.vx * 60 * dt;
+          p.y += p.vy * 60 * dt;
+        }
+        if (p.life <= 0) {
+          state.particles.splice(i, 1);
+        }
+      }
+    }
+
+    function updateWave(dt) {
+      if (state.mode !== 'game' || state.player == null) return;
+      if (state.enemies.length === 0) {
+        state.nextWaveTimer -= dt;
+        if (state.nextWaveTimer <= 0) {
+          state.wave += 1;
+          spawnWave();
+        }
+      }
+    }
+
+    function drawBackground() {
+      const bg = ctx.createLinearGradient(0, 0, VIEW_WIDTH, VIEW_HEIGHT);
+      bg.addColorStop(0, '#0b2234');
+      bg.addColorStop(1, '#081922');
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, VIEW_WIDTH, VIEW_HEIGHT);
+
+      // world grid
+      ctx.strokeStyle = 'rgba(255,255,255,0.045)';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < WORLD_WIDTH; x += 40) {
+        const sx = x - state.camera.x;
+        ctx.beginPath();
+        ctx.moveTo(sx, 0);
+        ctx.lineTo(sx, VIEW_HEIGHT);
+        ctx.stroke();
+      }
+      for (let y = 0; y < WORLD_HEIGHT; y += 40) {
+        const sy = y - state.camera.y;
+        ctx.beginPath();
+        ctx.moveTo(0, sy);
+        ctx.lineTo(VIEW_WIDTH, sy);
+        ctx.stroke();
+      }
+    }
+
+    function drawPlayer() {
+      const p = state.player;
+      if (!p) return;
+      const px = p.x - state.camera.x;
+      const py = p.y - state.camera.y;
+      ctx.save();
+      ctx.translate(px, py);
+      ctx.rotate(p.direction || 0);
+      if (p.standActive) {
+        ctx.shadowColor = standDefs[p.standName].accent;
+        ctx.shadowBlur = 18;
+      }
+      ctx.fillStyle = p.standActive ? standDefs[p.standName].color : '#f6f3ff';
+      ctx.beginPath();
+      ctx.arc(0, 0, p.r, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#1d2330';
+      ctx.beginPath();
+      ctx.arc(5, -2, 3.2, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = '#7ef0a3';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(p.r + 18, 0);
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.fillStyle = 'rgba(0,0,0,0.45)';
+      ctx.fillRect(px - 22, py - 28, 44, 6);
+      ctx.fillStyle = '#5af28d';
+      ctx.fillRect(px - 22, py - 28, 44 * (p.hp / p.maxHp), 6);
+    }
+
+    function drawEnemies() {
+      for (const enemy of state.enemies) {
+        const ex = enemy.x - state.camera.x;
+        const ey = enemy.y - state.camera.y;
+        ctx.save();
+        ctx.translate(ex, ey);
+        ctx.fillStyle = enemy.color;
+        ctx.beginPath();
+        ctx.arc(0, 0, enemy.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        ctx.fillStyle = 'rgba(0,0,0,0.45)';
+        ctx.fillRect(ex - enemy.r, ey - enemy.r - 12, enemy.r * 2, 6);
+        ctx.fillStyle = '#69f5a7';
+        ctx.fillRect(ex - enemy.r, ey - enemy.r - 12, (enemy.hp / enemy.maxHp) * enemy.r * 2, 6);
+      }
+    }
+
+    function drawProjectiles() {
+      for (const proj of state.projectiles) {
+        if (proj.owner === 'player') {
+          ctx.fillStyle = '#7ddcff';
+        } else {
+          ctx.fillStyle = '#ffb55c';
+        }
+        const px = proj.x - state.camera.x;
+        const py = proj.y - state.camera.y;
+        ctx.beginPath();
+        ctx.arc(px, py, proj.radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function drawParticles() {
+      for (const p of state.particles) {
+        const px = p.x - state.camera.x;
+        const py = p.y - state.camera.y;
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, p.life / p.maxLife);
+        if (p.type === 'text') {
+          ctx.fillStyle = p.color;
+          ctx.font = '700 14px Arial';
+          ctx.textAlign = 'center';
+          ctx.fillText(p.text, px, py);
+        } else {
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.arc(px, py, p.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+    }
+
+    function drawGameOver() {
+      if (state.mode !== 'over') return;
+      ctx.fillStyle = 'rgba(3, 5, 12, 0.72)';
+      ctx.fillRect(0, 0, VIEW_WIDTH, VIEW_HEIGHT);
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'center';
+      ctx.font = '700 34px Arial';
+      ctx.fillText('Battle Lost', VIEW_WIDTH / 2, VIEW_HEIGHT / 2 - 10);
+      ctx.font = '20px Arial';
+      ctx.fillText('Press R to restart or choose another stand', VIEW_WIDTH / 2, VIEW_HEIGHT / 2 + 28);
+      ctx.textAlign = 'left';
+    }
+
+    function drawStandAura() {
+      const p = state.player;
+      if (!p || !p.standActive) return;
+      const px = p.x - state.camera.x;
+      const py = p.y - state.camera.y;
+      ctx.beginPath();
+      ctx.arc(px, py, 38 + Math.sin(performance.now() * 0.02) * 6, 0, Math.PI * 2);
+      ctx.strokeStyle = standDefs[p.standName].color;
+      ctx.lineWidth = 2;
+      ctx.shadowColor = standDefs[p.standName].color;
+      ctx.shadowBlur = 16;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    }
+
+    function gameLoop() {
+      const now = performance.now();
+      const dt = Math.min((now - (state.lastTs || now)) / 1000, 0.033);
+      state.lastTs = now;
+
+      if (state.mode === 'game' && state.player) {
+        updatePlayer(dt);
+        updateEnemies(dt);
+        updateProjectiles(dt);
+        updateParticles(dt);
+        updateWave(dt);
+        if (state.timeStopTimer > 0) state.timeStopTimer -= dt;
+        updateHUD();
+      }
+
+      drawBackground();
+      if (state.player) {
+        drawStandAura();
+        drawProjectiles();
+        drawEnemies();
+        drawPlayer();
+        drawParticles();
+      }
+      drawGameOver();
+      requestAnimationFrame(gameLoop);
+    }
+
+    document.getElementById('startBattleBtn').addEventListener('click', startBattle);
+    document.getElementById('toggleStandBtn').addEventListener('click', toggleStand);
+
     document.addEventListener('keydown', (e) => {
+      const key = e.key.toLowerCase();
       input.keys[e.key] = true;
+      input.keys[key] = true;
 
-      if (gameState.mode === 'game') {
-        if (e.key.toLowerCase() === 'q') {
-          gameState.player.standActive = !gameState.player.standActive;
+      if (state.mode === 'game' && state.player) {
+        if (key === 'q') toggleStand();
+        if (key === 'r' && state.mode === 'over') {
+          resetBattle();
         }
-
-        if (e.key.toLowerCase() === 'r' && !gameState.running) {
-          document.getElementById('menuOverlay').classList.remove('hidden');
-          gameState.mode = 'menu';
-        }
-
-        const ability = gameState.player.abilities.find(a => a.key.toLowerCase() === e.key.toLowerCase());
-        if (ability) {
-          castAbility(ability);
-        }
+        const ability = state.player.abilities.find(a => a.key.toLowerCase() === key);
+        if (ability) castAbility(ability);
       }
     });
 
     document.addEventListener('keyup', (e) => {
       input.keys[e.key] = false;
+      input.keys[e.key.toLowerCase()] = false;
     });
 
     canvas.addEventListener('mousemove', (e) => {
       const rect = canvas.getBoundingClientRect();
-      input.mouse.x = e.clientX - rect.left;
-      input.mouse.y = e.clientY - rect.top;
-
-      if (gameState.player) {
-        gameState.player.direction = Math.atan2(
-          input.mouse.y - gameState.player.y,
-          input.mouse.x - gameState.player.x
+      input.mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
+      input.mouseY = (e.clientY - rect.top) * (canvas.height / rect.height);
+      if (state.player) {
+        state.player.direction = Math.atan2(
+          input.mouseY + state.camera.y - state.player.y,
+          input.mouseX + state.camera.x - state.player.x
         );
       }
     });
 
-    canvas.addEventListener('click', () => {
-      if (gameState.running && gameState.player && gameState.player.standActive) {
-        const p = gameState.player;
-        gameState.enemies.forEach(enemy => {
-          const d = Math.hypot(enemy.x - p.x, enemy.y - p.y);
-          if (d < 70) {
-            enemy.hp -= 12 * p.damageMultiplier;
-            gameState.particles.push({
-              x: enemy.x, y: enemy.y,
-              text: `-${Math.round(12 * p.damageMultiplier)}`,
-              life: 0.6,
-              color: '#ff7688'
-            });
-            if (enemy.hp <= 0) {
-              gameState.enemies.splice(gameState.enemies.indexOf(enemy), 1);
-              gameState.score += 10;
-              p.power = Math.min(p.maxPower, p.power + 15);
-            }
-          }
-        });
-      }
+    canvas.addEventListener('mousedown', () => {
+      if (state.mode === 'game' && state.player) playerMelee();
     });
 
-    let lastFrame = performance.now();
-    function gameLoop() {
-      const now = performance.now();
-      const deltaTime = Math.min((now - lastFrame) / 1000, 0.033);
-      lastFrame = now;
-
-      if (gameState.running && gameState.mode === 'game') {
-        updateGame(deltaTime);
-      }
-
-      renderGame();
-      requestAnimationFrame(gameLoop);
-    }
-
-    initMenu();
-    gameLoop();
+    buildStandMenu();
+    updateHUD();
+    requestAnimationFrame(gameLoop);
   </script>
 </body>
 </html>
